@@ -16,13 +16,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16" # 根据你的项目需求选择 Node.js 版本
+          node-version: "22"
 
       - name: Install dependencies
         run: npm install
 
       - name: Build
-        run: npm run build # 假设你有一个 build 脚本
+        run: npm run build
 
       - name: Login to Alibaba Cloud Container Registry
         run: |
