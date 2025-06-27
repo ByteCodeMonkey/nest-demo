@@ -13,23 +13,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          go-version: "1.22.5"
+          node-version: "16" # 根据你的项目需求选择 Node.js 版本
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Build
-        run: go build -o jiang-go-study
+        run: npm run build # 假设你有一个 build 脚本
 
       - name: Login to Alibaba Cloud Container Registry
         run: |
-          echo "${{ secrets.ALIYUN_DOCKER_PASSWORD }}" | docker login --username ${{ secrets.ALIYUN_DOCKER_USERNAME }} --password-stdin registry.cn-hangzhou.aliyuncs.com
+          echo "${{ secrets.ALIYUN_DOCKER_PASSWORD }}" | docker login --username="${{ secrets.ALIYUN_DOCKER_USERNAME }}" --password-stdin crpi-6u1ldnk9renneqhh.cn-shanghai.personal.cr.aliyuncs.com
 
       - name: Build Docker image
-        run: docker build -t registry.cn-hangzhou.aliyuncs.com/jiang-go/jiang-go-study:latest .
+        run: docker build -t crpi-6u1ldnk9renneqhh.cn-shanghai.personal.cr.aliyuncs.com/jiang-go/jiang-go-nest:latest .
 
       - name: Push Docker image
-        run: docker push registry.cn-hangzhou.aliyuncs.com/jiang-go/jiang-go-study:latest
+        run: docker push crpi-6u1ldnk9renneqhh.cn-shanghai.personal.cr.aliyuncs.com/jiang-go/jiang-go-nest:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -43,8 +46,8 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            docker login --username ${{ secrets.ALIYUN_DOCKER_USERNAME }} --password ${{ secrets.ALIYUN_DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
-            docker pull registry.cn-hangzhou.aliyuncs.com/jiang-go/jiang-go-study:latest
-            docker ps -q --filter "name=jiang-go-study" | grep -q . && docker stop jiang-go-study || echo "Container jiang-go-study is not running"
-            docker ps -a -q --filter "name=jiang-go-study" | grep -q . && docker rm jiang-go-study || echo "Container jiang-go-study does not exist"
-            docker run -d --name jiang-go-study -p 8080:8080 registry.cn-hangzhou.aliyuncs.com/jiang-go/jiang-go-study:latest
+            docker login --username="${{ secrets.ALIYUN_DOCKER_USERNAME }}" --password="${{ secrets.ALIYUN_DOCKER_PASSWORD }}" crpi-6u1ldnk9renneqhh.cn-shanghai.personal.cr.aliyuncs.com
+            docker pull crpi-6u1ldnk9renneqhh.cn-shanghai.personal.cr.aliyuncs.com/jiang-go/jiang-go-nest:latest
+            docker ps -q --filter "name=jiang-go-nest" | grep -q . && docker stop jiang-go-nest || echo "Container jiang-go-nest is not running"
+            docker ps -a -q --filter "name=jiang-go-nest" | grep -q . && docker rm jiang-go-nest || echo "Container jiang-go-nest does not exist"
+            docker run -d --name jiang-go-nest -p 8080:8080 crpi-6u1ldnk9renneqhh.cn-shanghai.personal.cr.aliyuncs.com/jiang-go/jiang-go-nest:latest
